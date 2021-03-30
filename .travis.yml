@@ -1,0 +1,18 @@
+dist: trusty
+
+cron:
+  - branch: master
+    interval: monthly
+    options: always run
+
+jobs:
+  include:
+    - stage: build docker image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker build -t cibiltech/compose .
+      - docker tag cibiltech/compose cibiltech/compose:latest
+      - docker push cibiltech/compose
+    - stage: test
+      script: docker run --rm cibiltech/compose help
+    - script: docker run --rm cibiltech/compose help
